@@ -5,12 +5,8 @@ rm(list = ls())
 library(tidyverse)
 library(epiR)
 library(arsenal)
-#library(sjPlot)
-#library(glmnet)
-#library(ROCit)
-#library(Amelia)
 
-#dat <- read_csv("data/heu_cleandata07102020.csv")
+
 dat <- read_csv("data/heu_data_clean_12022021.csv")
 ##### create baseline table ####
 
@@ -27,21 +23,6 @@ tabcontrols  <- tableby.control(test=TRUE, total=TRUE,
                                  meansd="Mean(SD)",
                                  medianq1q3='Median(Q1,Q3)'),
                                simulate.p.value = T)
-# tab controls for z scores
-### table controls ###
-#ctrls  <- tableby.control(test=TRUE, total=TRUE,
-#                                numeric.test="kwt", cat.test="fe",  
-#                                numeric.stats=c("N","mean","sd"),
-#                                cat.stats=c("N","countpct"),
-#                                digits = 2,
-#                                digits.pct = 2,
-#                                digits.p = 2,
-#                                stats.labels=list(
-#                                  N='Count',
-#                                  meansd="Mean(SD)",
-#                                  medianq1q3='Median(Q1,Q3)'),
-#                                simulate.p.value = T)
-
 
 tablabels <- list(
   AgeWhol = "Age",
@@ -145,7 +126,6 @@ tab1 <- tableby(Hstatus ~ AgeWhol
                 + factor(diseaseSeverityA),data=dat, control = tabcontrols)
 
 summary(tab1,text = TRUE,labelTranslations = tablabels,pfootnote = TRUE)
-#write2word(tab1,file = "baselineTable11202020.doc")
 write2word(tab1,file = "baselineTable23012021v3.doc")
 
 
@@ -164,44 +144,20 @@ epiHeu <- dat[which(dat$hiveu==1),]
 epiHuu <- dat[which(dat$hivuu==1),]
 
 
-## function to calculate diagnostic tests for the HUU group
 
-calculate_diagnostics <- function(outcome,exposure){
-  xtab <- table(factor(epiHuu[[exposure]],levels = c("1","0")),factor(epiHuu[[outcome]],levels = c("1","0")))
-  xtabTest <- epiR::epi.tests(xtab)
-  res <- data.frame(Est=c(xtabTest$elements$ppv,
-                          xtabTest$elements$npv,
-                          xtabTest$elements$lrpos,
-                          youden=xtabTest$elements$youden$est),
-                    Lower=c(xtabTest$elements$ppv.low,
-                            xtabTest$elements$npv.low,
-                            xtabTest$elements$lrpos.low,
-                            xtabTest$elements$youden$lower),
-                    Upper=c(xtabTest$elements$ppv.up,
-                            xtabTest$elements$npv.up,
-                            xtabTest$elements$lrpos.up,
-                            xtabTest$elements$youden$upper))
-  rownames(res) <- c("ppv","npv","lr","youden")
-  return(res)
-}
 
 calculate_diagnostics("diseaseSeverityA","hfever")
 calculate_diagnostics("diseaseseverityA","LBW")
 calculate_diagnostics("diseaseSeverityA","dangerSigns")
 calculate_diagnostics("diseaseSeverityA","rash")
-#calculate_diagnostics("diseaseSeverityA","lethargic")
 calculate_diagnostics("diseaseSeverityA","nasalfl")
 calculate_diagnostics("diseaseSeverityA","whez")
 calculate_diagnostics("diseaseSeverityA","icid")
 calculate_diagnostics("diseaseSeverityA","thrush")
 calculate_diagnostics("diseaseSeverityA","strid")
-#calculate_diagnostics("diseaseSeverityA","snkeye")
-#calculate_diagnostics("diseaseSeverityA","hhsize")
 calculate_diagnostics("diseaseSeverityA","antib.use") 
 calculate_diagnostics("diseaseSeverityA","epiVacHue")
 calculate_diagnostics("diseaseSeverityA","tachpenia")
-#calculate_diagnostics("diseaseSeverityA","tachpenia2")
-
 calculate_diagnostics("diseaseSeverityA","muac.score")
 calculate_diagnostics("diseaseSeverityA","prvHosp")
 calculate_diagnostics("diseaseSeverityA","pnemo")
